@@ -1,0 +1,109 @@
+```html
+<!-- Logika JavaScript -->
+<script>
+    // URL Google Apps Script
+    const API_URL = "https://script.google.com/macros/s/AKfycbziothSrGzNWIkC19Rmu2WDSeNGbRHXtlbnrn2isF392RdPjIW2tZbpGsteRIKSMF6E-g/exec";
+
+    // Nomor WhatsApp Admin Zatria
+    const WA_ADMIN = "6283873099640";
+
+    // Pencarian produk
+    function toggleSearch() {
+        document.getElementById("searchBox").classList.toggle("show");
+        document.getElementById("searchInput").focus();
+    }
+
+    function searchProducts() {
+        const keyword = document.getElementById("searchInput").value.toLowerCase();
+
+        document.querySelectorAll(".product").forEach(product => {
+            const name = product.querySelector("h3").textContent.toLowerCase();
+            const category = document.querySelector(".categories button.active")?.textContent.trim();
+
+            const matchesSearch = name.includes(keyword);
+            const matchesCategory = !category ||
+                category === "Semua Produk" ||
+                product.dataset.category === category;
+
+            product.style.display = matchesSearch && matchesCategory ? "" : "none";
+        });
+
+        updateEmptyMessage();
+    }
+
+    // Filter kategori
+    function filterCategory(category, button) {
+        document.querySelectorAll(".categories button").forEach(btn => {
+            btn.classList.remove("active");
+        });
+
+        button.classList.add("active");
+
+        document.querySelectorAll(".product").forEach(product => {
+            const keyword = document.getElementById("searchInput").value.toLowerCase();
+            const name = product.querySelector("h3").textContent.toLowerCase();
+
+            const matchesCategory =
+                category === "Semua" ||
+                product.dataset.category === category;
+
+            const matchesSearch = name.includes(keyword);
+
+            product.style.display = matchesCategory && matchesSearch ? "" : "none";
+        });
+
+        updateEmptyMessage();
+    }
+
+    // Tombol filter
+    function showFilter() {
+        document.getElementById("kategori").scrollIntoView({
+            behavior: "smooth",
+            block: "nearest"
+        });
+    }
+
+    // Urutkan produk berdasarkan harga
+    let ascending = true;
+
+    function sortProducts() {
+        const list = document.getElementById("productList");
+        const products = Array.from(list.querySelectorAll(".product"));
+
+        products.sort((a, b) => {
+            const priceA = Number(a.dataset.price);
+            const priceB = Number(b.dataset.price);
+
+            return ascending ? priceA - priceB : priceB - priceA;
+        });
+
+        products.forEach(product => list.appendChild(product));
+        ascending = !ascending;
+    }
+
+    // Pemesanan melalui WhatsApp
+    function orderProduct(name, price) {
+        const message =
+            "Halo Admin Zatria, saya ingin memesan produk berikut:\n\n" +
+            "Nama produk: " + name + "\n" +
+            "Harga: Rp" + Number(price).toLocaleString("id-ID") + "\n\n" +
+            "Mohon informasi selanjutnya. Terima kasih.";
+
+        const url =
+            "https://wa.me/" + WA_ADMIN +
+            "?text=" + encodeURIComponent(message);
+
+        window.open(url, "_blank");
+    }
+
+    // Pesan ketika produk tidak ditemukan
+    function updateEmptyMessage() {
+        const visibleProducts = Array.from(
+            document.querySelectorAll(".product")
+        ).some(product => product.style.display !== "none");
+
+        document.getElementById("emptyMessage").style.display =
+            visibleProducts ? "none" : "block";
+    }
+</script>
+```
